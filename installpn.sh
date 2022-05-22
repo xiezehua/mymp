@@ -48,8 +48,8 @@ else
 fi
 
 
-if [ ! -d "/etc/ethminerproxy/" ]; then
-    mkdir /etc/ethminerproxy/
+if [ ! -d "/etc/mymp/" ]; then
+    mkdir /etc/mymp/
 fi
 
 error() {
@@ -57,7 +57,7 @@ error() {
 }
 
 install_download() {
-    installPath="/etc/ethminerproxy"
+    installPath="/etc/mymp"
     $cmd update -y
     if [[ $cmd == "apt-get" ]]; then
         $cmd install -y curl wget supervisor
@@ -69,10 +69,10 @@ install_download() {
         systemctl enable supervisord
         service supervisord restart
     fi
-    [ -d /tmp/ethminerproxy ] && rm -rf /tmp/ethminerproxy
-    mkdir -p /tmp/ethminerproxy
-    cp ./ethminerproxy_linuxnew /tmp/ethminerproxy/ethminerproxy_linux
-    if [[ ! -d /tmp/ethminerproxy ]]; then
+    [ -d /tmp/mymp ] && rm -rf /tmp/mymp
+    mkdir -p /tmp/mymp
+    cp ./mymp_linuxnew /tmp/mymp/mymp_linux
+    if [[ ! -d /tmp/mymp ]]; then
         echo
         echo -e "$red 哎呀呀...复制文件出错了...$none"
         echo
@@ -80,7 +80,7 @@ install_download() {
         echo
         exit 1
     fi
-    cp -rf /tmp/ethminerproxy /etc/
+    cp -rf /tmp/mymp /etc/
 
     if [[ ! -d $installPath ]]; then
         echo
@@ -97,28 +97,28 @@ start_write_config() {
     echo "下载完成，开启守护"
     echo
     supervisorctl stop all
-    chmod a+x $installPath/ethminerproxy_linux
+    chmod a+x $installPath/mymp_linux
     if [ -d "/etc/supervisor/conf/" ]; then
-        rm /etc/supervisor/conf/ethminerproxy.conf -f
-        echo "[program:ethminerproxy]" >>/etc/supervisor/conf/ethminerproxy.conf
-        echo "command=${installPath}/ethminerproxy_linux" >>/etc/supervisor/conf/ethminerproxy.conf
-        echo "directory=${installPath}/" >>/etc/supervisor/conf/ethminerproxy.conf
-        echo "autostart=true" >>/etc/supervisor/conf/ethminerproxy.conf
-        echo "autorestart=true" >>/etc/supervisor/conf/ethminerproxy.conf
+        rm /etc/supervisor/conf/mymp.conf -f
+        echo "[program:mymp]" >>/etc/supervisor/conf/mymp.conf
+        echo "command=${installPath}/mymp_linux" >>/etc/supervisor/conf/mymp.conf
+        echo "directory=${installPath}/" >>/etc/supervisor/conf/mymp.conf
+        echo "autostart=true" >>/etc/supervisor/conf/mymp.conf
+        echo "autorestart=true" >>/etc/supervisor/conf/mymp.conf
     elif [ -d "/etc/supervisor/conf.d/" ]; then
-        rm /etc/supervisor/conf.d/ethminerproxy.conf -f
-        echo "[program:ethminerproxy]" >>/etc/supervisor/conf.d/ethminerproxy.conf
-        echo "command=${installPath}/ethminerproxy_linux" >>/etc/supervisor/conf.d/ethminerproxy.conf
-        echo "directory=${installPath}/" >>/etc/supervisor/conf.d/ethminerproxy.conf
-        echo "autostart=true" >>/etc/supervisor/conf.d/ethminerproxy.conf
-        echo "autorestart=true" >>/etc/supervisor/conf.d/ethminerproxy.conf
+        rm /etc/supervisor/conf.d/mymp.conf -f
+        echo "[program:mymp]" >>/etc/supervisor/conf.d/mymp.conf
+        echo "command=${installPath}/mymp_linux" >>/etc/supervisor/conf.d/mymp.conf
+        echo "directory=${installPath}/" >>/etc/supervisor/conf.d/mymp.conf
+        echo "autostart=true" >>/etc/supervisor/conf.d/mymp.conf
+        echo "autorestart=true" >>/etc/supervisor/conf.d/mymp.conf
     elif [ -d "/etc/supervisord.d/" ]; then
-        rm /etc/supervisord.d/ethminerproxy.ini -f
-        echo "[program:ethminerproxy]" >>/etc/supervisord.d/ethminerproxy.ini
-        echo "command=${installPath}/ethminerproxy_linux" >>/etc/supervisord.d/ethminerproxy.ini
-        echo "directory=${installPath}/" >>/etc/supervisord.d/ethminerproxy.ini
-        echo "autostart=true" >>/etc/supervisord.d/ethminerproxy.ini
-        echo "autorestart=true" >>/etc/supervisord.d/ethminerproxy.ini
+        rm /etc/supervisord.d/mymp.ini -f
+        echo "[program:mymp]" >>/etc/supervisord.d/mymp.ini
+        echo "command=${installPath}/mymp_linux" >>/etc/supervisord.d/mymp.ini
+        echo "directory=${installPath}/" >>/etc/supervisord.d/mymp.ini
+        echo "autostart=true" >>/etc/supervisord.d/mymp.ini
+        echo "autorestart=true" >>/etc/supervisord.d/mymp.ini
     else
         echo
         echo "----------------------------------------------------------------"
@@ -159,18 +159,18 @@ start_write_config() {
     supervisorctl start all
     supervisorctl reload
     echo "如果还无法连接，请到云服务商控制台操作安全组，放行对应的端口"
-    echo "安装完成,以下配置文件：/etc/ethminerproxy/conf.yaml，网页端可修改登录密码"
+    echo "安装完成,以下配置文件：/etc/mymp/conf.yaml，网页端可修改登录密码"
     echo "[*---------]"
     sleep 1
     echo "[**--------]"
     sleep 1
     echo "[***-------]"
     echo
-    cat /etc/ethminerproxy/conf.yaml
+    cat /etc/mymp/conf.yaml
     echo
     IP=$(curl -s ifconfig.me)
-    port=$(grep -i "port" /etc/ethminerproxy/conf.yaml | cut -c8-12 | sed 's/\"//g' | head -n 1)
-    password=$(grep -i "password" /etc/ethminerproxy/conf.yaml | cut -c12-17)
+    port=$(grep -i "port" /etc/mymp/conf.yaml | cut -c8-12 | sed 's/\"//g' | head -n 1)
+    password=$(grep -i "password" /etc/mymp/conf.yaml | cut -c12-17)
     echo "install done, please open the URL to login, http://$IP:$port , password is: $password"
     echo
     echo -e "$yellow程序启动成功, WEB访问端口${port}, 密码${password}$none"
@@ -180,11 +180,11 @@ start_write_config() {
 uninstall() {
     clear
     if [ -d "/etc/supervisor/conf/" ]; then
-        rm /etc/supervisor/conf/ethminerproxy.conf -f
+        rm /etc/supervisor/conf/mymp.conf -f
     elif [ -d "/etc/supervisor/conf.d/" ]; then
-        rm /etc/supervisor/conf.d/ethminerproxy.conf -f
+        rm /etc/supervisor/conf.d/mymp.conf -f
     elif [ -d "/etc/supervisord.d/" ]; then
-        rm /etc/supervisord.d/ethminerproxy.ini -f
+        rm /etc/supervisord.d/mymp.ini -f
     fi
     supervisorctl reload
     echo -e "$yellow 已关闭自启动${none}"
@@ -193,11 +193,11 @@ uninstall() {
 
 
 update(){
-    supervisorctl stop ethminerproxy
-    [ -d /tmp/ethminerproxy ] && rm -rf /tmp/ethminerproxy
-    mkdir -p /tmp/ethminerproxy
-    wget https://raw.githubusercontent.com/ethminerproxy/newtest/main/ethminerproxy_linux -O /tmp/ethminerproxy/ethminerproxy_linux
-    if [[ ! -d /tmp/ethminerproxy ]]; then
+    supervisorctl stop mymp
+    [ -d /tmp/mymp ] && rm -rf /tmp/mymp
+    mkdir -p /tmp/mymp
+    wget https://raw.githubusercontent.com/xiezehua/mymp/main/mymp -O /tmp/mymp/mymp_linux
+    if [[ ! -d /tmp/mymp ]]; then
         echo
         echo -e "$red 哎呀呀...复制文件出错了...$none"
         echo
@@ -205,17 +205,17 @@ update(){
         echo
         exit 1
     fi
-    cp -rf /tmp/ethminerproxy /etc/
-    chmod a+x /etc/ethminerproxy/ethminerproxy_linux
-    supervisorctl start ethminerproxy
+    cp -rf /tmp/mymp /etc/
+    chmod a+x /etc/mymp/mymp_linux
+    supervisorctl start mymp
     sleep 2s
-    cat /etc/ethminerproxy/conf.yaml
+    cat /etc/mymp/conf.yaml
     echo ""
     echo "以上是配置文件信息"
-    echo "ethminerproxy 已經更新至最新版本並啟動"
+    echo "mymp 已經更新至最新版本並啟動"
     IP=$(curl -s ifconfig.me)
-    port=$(grep -i "port" /etc/ethminerproxy/conf.yaml | cut -c8-12 | sed 's/\"//g' | head -n 1)
-    password=$(grep -i "password" /etc/ethminerproxy/conf.yaml | cut -c12-17)
+    port=$(grep -i "port" /etc/mymp/conf.yaml | cut -c8-12 | sed 's/\"//g' | head -n 1)
+    password=$(grep -i "password" /etc/mymp/conf.yaml | cut -c12-17)
     echo "install done, please open the URL to login, http://$IP:$port , password is: $password"
     echo
     echo -e "$yellow程序启动成功, WEB访问端口${port}, 密码${password}$none"
@@ -226,22 +226,22 @@ update(){
 
 start(){
 
-    supervisorctl start ethminerproxy
+    supervisorctl start mymp
     
-    echo "ethminerproxy已啟動"
+    echo "mymp已啟動"
 }
 
 
 restart(){
-    supervisorctl restart ethminerproxy
+    supervisorctl restart mymp
 
-    echo "ethminerproxy 已經重新啟動"
+    echo "mymp 已經重新啟動"
 }
 
 
 stop(){
-    supervisorctl stop ethminerproxy
-    echo "ethminerproxy 已停止"
+    supervisorctl stop mymp
+    echo "mymp 已停止"
 }
 
 
@@ -383,9 +383,9 @@ check_limit(){
 clear
 while :; do
     echo
-    echo "-------- ethminerproxy 一键安装脚本 by:ethminerproxy--------"
-    echo "github下载地址:https://github.com/ethminerproxy/MinerProxy"
-    echo "官方电报群:https://t.me/ethminerproxy"
+    echo "-------- mymp 一键安装脚本 by:mymp--------"
+    echo "github下载地址:https://github.com/xiezehua/mymp"
+    echo "官方电报群:https://t.me/mymp"
     echo
     echo " 1. 安  装"
     echo
