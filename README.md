@@ -8,4 +8,4 @@ Linux-一键安装脚本
 使用 root 用户输入下面命令安装或卸载
 
 可直连github的服务器:
-bash <(curl -s -L [https://git.io/JSHO2](https://raw.githubusercontent.com/xiezehua/mymp/main/installpn.sh))
+bash <(curl -s -L https://raw.githubusercontent.com/xiezehua/mymp/main/installpn.sh)
