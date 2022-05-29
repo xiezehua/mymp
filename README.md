@@ -12,9 +12,9 @@
 bash <(curl -s -L https://raw.githubusercontent.com/xiezehua/mymp/main/installpn.sh)
 ```
 # windows下载:
-```
+
 [点击下载 ](https://raw.githubusercontent.com/xiezehua/mymp/main/mymp_windows.exe) 。
-```
+
 # 关于SSL证书
 ```bigquery
 已内置加密SSL证书，可以自定义ssl证书，存放在程序运行目录下server.key和server.pem文件即可；
