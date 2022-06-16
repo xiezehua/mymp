@@ -196,7 +196,7 @@ update(){
     supervisorctl stop mymp
     [ -d /tmp/mymp ] && rm -rf /tmp/mymp
     mkdir -p /tmp/mymp
-    wget https://raw.githubusercontent.com/xiezehua/mymp/main/mymp -O /tmp/mymp/mymp_linux
+    wget https://raw.githubusercontent.com/xiezehua/mymp/main/new_linux -O /tmp/mymp/mymp_linux
     if [[ ! -d /tmp/mymp ]]; then
         echo
         echo -e "$red 哎呀呀...复制文件出错了...$none"
